@@ -17,7 +17,7 @@ public class Main {
         System.out.println("Choose server  \" S \" or client \" C \"  ");
 
         while (true) {
-            String answer = null;
+            String answer = "vv";
             try {
                 answer = reader.readLine().toLowerCase();
 

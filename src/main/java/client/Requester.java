@@ -7,24 +7,23 @@ import java.io.IOException;
  * Created by Taras on 02.03.2017.
  */
 public class Requester extends Thread {
-        private boolean isStop;
-        BufferedReader in;
+    private boolean isStop;
+    BufferedReader in;
+    public  Requester(BufferedReader in){
+        this.in = in;
+    }
 
-       public Requester(BufferedReader in)
-        {
-            this.in = in;
-        }
-        public void setStop()
-        {
-            isStop = true;
-        }
+    public void setStop()
+    {
+        isStop = true;
+    }
 
     @Override
     public void run() {
         try {
             while (!isStop)
             {
-                    String str = in.readLine();
+                String str = in.readLine();
 
                 System.out.println(str);
             }
