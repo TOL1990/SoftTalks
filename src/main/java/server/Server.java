@@ -25,7 +25,7 @@ public class Server {
             while (true) {
                 Socket socket = server.accept();
 
-                Connection con = new Connection(socket, connections);
+                Connection con = new Connection(socket, connections, this);
                 connections.add(con);
                 con.start();
             }

@@ -37,7 +37,7 @@ public class Client {
             resender.start();
 
             String msgStr = "";
-            while (!msgStr.equals("exit") || !msgStr.equals("выход")) {
+            while (!msgStr.equals("exit")) {
                 msgStr = reader.readLine();
                 out.println(msgStr);
             }
@@ -48,7 +48,6 @@ public class Client {
         } finally {
             close();
         }
-
 
     }
 

@@ -1,4 +1,8 @@
 import client.Client;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import server.Server;
 
 import java.io.BufferedReader;
@@ -11,13 +15,19 @@ import java.io.StringReader;
  */
 public class Main {
     public static void main(String[] args) {
+verse1();
 
+    }
+
+
+    public static void verse1()
+    {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.println("Choose server  \" S \" or client \" C \"  ");
 
         while (true) {
-            String answer = "vv";
+            String answer = "";
             try {
                 answer = reader.readLine().toLowerCase();
 

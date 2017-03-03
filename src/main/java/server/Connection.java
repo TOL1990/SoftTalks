@@ -5,23 +5,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by Taras on 02.03.2017.
  */
 public class Connection extends Thread {
+    List<Connection> connections;
     private BufferedReader in;
     private PrintWriter out;
     private Socket socket;
-    List<Connection> connections;
-
     private String nik = "";
+    private Server server;
 
-    public Connection(Socket socket, List<Connection> connections) {
+    public Connection(Socket socket, List<Connection> connections, Server server) {
         this.socket = socket;
         this.connections = connections;
+        this.server = server;
         try {
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.out = new PrintWriter(socket.getOutputStream(), true);
@@ -37,10 +37,12 @@ public class Connection extends Thread {
             nik = in.readLine();
 
             synchronized (connections) {
-                Iterator<Connection> iter = connections.iterator();
-                while (iter.hasNext()) {
-                    ((Connection) iter.next()).out.println(nik + " connected to Soft chat");
+
+                for (Connection con :
+                        connections) {
+                    con.out.println(nik + " connected to Soft chat");
                 }
+
             }
 
             String msg = "";
@@ -49,21 +51,21 @@ public class Connection extends Thread {
                 if (msg.equals("exit")) break;
 
                 synchronized (connections) {
-                    Iterator<Connection> iterator = connections.iterator();
-                    while (iterator.hasNext()) {
-                        ((Connection) iterator.next()).out.println(nik + ": " + msg);
+                    for (Connection con :
+                            connections) {
+                        con.out.println(nik + ": " + msg);
+                    }
+
+                }
+            }
+            synchronized (connections) {
+                synchronized (connections) {
+                    for (Connection con :
+                            connections) {
+                        con.out.println(nik + " has left.");
                     }
                 }
             }
-            synchronized (connections)
-            {
-                Iterator<Connection> iterator = connections.iterator();
-                while (iterator.hasNext())
-                {
-                    ((Connection)iterator.next()).out.println(nik + " has left.");
-                }
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -78,11 +80,11 @@ public class Connection extends Thread {
             out.close();
             socket.close();
 
-//            connections.remove(this);
-//            if (connections.size() == 0) {
-//                Server.this.closeAll(); // дописать метод
-//                System.exit(0);
-//            }
+            connections.remove(this);
+            if (connections.size() == 0) {
+                server.closeAll();
+                System.exit(0);
+            }
 
         } catch (IOException e) {
             System.out.println("Threads weren't close");
