@@ -1,28 +1,26 @@
 import client.Client;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import server.Server;
+import service.DBPlayers;
+import service.DaoService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 
 /**
  * Created by Taras on 02.03.2017.
  */
 public class Main {
     public static void main(String[] args) {
-verse1();
+        verse1();
 
     }
 
 
-    public static void verse1()
-    {
+    public static void verse1() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        getUsersFromDB();
 
         System.out.println("Choose server  \" S \" or client \" C \"  ");
 
@@ -44,5 +42,12 @@ verse1();
                 e.printStackTrace();
             }
         }
+    }
+
+
+    private static void getUsersFromDB() {
+        DBPlayers.playersList = new DaoService().getAllPlayers();
+
+        System.out.println(DBPlayers.playersList);
     }
 }
