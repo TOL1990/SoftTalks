@@ -50,4 +50,22 @@ public class Player {
     public void setPasword(String pasword) {
         this.pasword = pasword;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Player player = (Player) o;
+
+        if (!nickName.equals(player.nickName)) return false;
+        return pasword != null ? pasword.equals(player.pasword) : player.pasword == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nickName.hashCode();
+        result = 31 * result + (pasword != null ? pasword.hashCode() : 0);
+        return result;
+    }
 }

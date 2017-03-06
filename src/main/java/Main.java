@@ -20,7 +20,6 @@ public class Main {
     public static void verse1() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        getUsersFromDB();
 
         System.out.println("Choose server  \" S \" or client \" C \"  ");
 
@@ -44,6 +43,9 @@ public class Main {
         }
     }
 
+    //Сервер грузится собирает в себя кеш с бд
+//    метод провайдер
+    // новый юзер обращается к серверу для регистрации или логина
 
     private static void getUsersFromDB() {
         DBPlayers.playersList = new DaoService().getAllPlayers();
@@ -51,3 +53,13 @@ public class Main {
         System.out.println(DBPlayers.playersList);
     }
 }
+/*
+-стартует сервер и забирает в себя кеш БД.
+
+
+2.юзер получает от сервера "Введите логин и пароль"
+3. вводит и отправляет данные на сервер
+- сервер проверяет есть ли в кеше такой юзер и таким паролем
+- если есть - оповещает все конекшены что добавился новый персонаж, если нет то создает и оповещает
+
+ */

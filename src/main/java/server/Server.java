@@ -1,6 +1,6 @@
 package server;
 
-import service.DBPlayers;
+import model.entity.Player;
 import service.DaoService;
 
 import java.io.IOException;
@@ -11,45 +11,48 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by Taras on 02.03.2017.
- */
-public class Server {
-    public static final int PORT = 7000;
 
-    private List<Connection> connections =
-            Collections.synchronizedList(new ArrayList<Connection>());
+public class Server {
+    private static int PORT = 7000;
+    private List<ServerThread> serverThreads =
+            Collections.synchronizedList(new ArrayList<ServerThread>());
+
+    protected static ArrayList<Player> playersList;
+
     private ServerSocket server;
 
     public Server() {
         try {
             server = new ServerSocket(PORT);
 
+            playersList = new DaoService().getAllPlayers();
+            System.out.println("Server lunched");
             while (true) {
                 Socket socket = server.accept();
 
-                Connection con = new Connection(socket, connections, this);
-                connections.add(con);
+                ServerThread con = new ServerThread(socket, serverThreads, this);
+                serverThreads.add(con);
                 con.start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             closeAll();
+            System.out.println("Server closed!");
         }
+        //Сгружаем всех юзеров.
     }
-
 
 
     public void closeAll() {
         try {
             server.close();
 
-            //Run allow all connections and shut them down
-            synchronized (connections) {
-                Iterator<Connection> iter = connections.iterator();
+            //Run allow all serverThreads and shut them down
+            synchronized (serverThreads) {
+                Iterator<ServerThread> iter = serverThreads.iterator();
                 while (iter.hasNext()) {
-                    ((Connection) iter.next()).close();
+                    ((ServerThread) iter.next()).close();
                 }
             }
         } catch (Exception e) {
@@ -57,4 +60,12 @@ public class Server {
         }
     }
 
+    /**
+     * Add new user to DB and update cashed list
+     */
+    public void addNewUser(String nickName, String password) {
+        DaoService daoService = new DaoService();
+        daoService.addPlayer(nickName, password);
+        playersList = daoService.getAllPlayers();
+    }
 }

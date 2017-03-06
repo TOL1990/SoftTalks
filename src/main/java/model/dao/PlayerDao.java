@@ -45,7 +45,6 @@ public class PlayerDao {
 
             statement.setString(1, player.getNickName());
             statement.setString(2, player.getPasword());
-
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

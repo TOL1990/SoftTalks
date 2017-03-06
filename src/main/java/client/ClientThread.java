@@ -6,10 +6,10 @@ import java.io.IOException;
 /**
  * Created by Taras on 02.03.2017.
  */
-public class Requester extends Thread {
+public class ClientThread extends Thread {
     private boolean isStop;
     BufferedReader in;
-    public  Requester(BufferedReader in){
+    public ClientThread(BufferedReader in){
         this.in = in;
     }
 
