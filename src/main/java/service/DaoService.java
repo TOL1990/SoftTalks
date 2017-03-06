@@ -21,7 +21,6 @@ public class DaoService {
     }
 
     public void addPlayer(String nick, String password) {
-
         PlayerDao.addPlayer(new Player(nick, password));
     }
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class ServerThread extends Thread {
     private BufferedReader in;
     private PrintWriter out;
     private Socket socket;
-    private String nik = "";
+    private String nick = "";
     private Server server;
 
     public ServerThread(Socket socket, List<ServerThread> connections, Server server) {
@@ -29,45 +30,42 @@ public class ServerThread extends Thread {
             this.out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
             e.printStackTrace();
-            close(); // ServerThread must be closed
+            close();
         }
     }
 
     @Override
     public void run() {
         try {
-            nik = in.readLine();
-            String pass = in.readLine();
-            checkAuthorisation(nik, pass);
-                synchronized (connections) {
 
+            authorisation();
+            synchronized (connections) {
+                for (ServerThread con :
+                        connections) {
+                    con.out.println(nick + " connected to Soft chat");
+                }
+            }
+
+            String msg = "";
+            while (true) {
+                msg = in.readLine();
+                if (msg.equals("exit")) break;
+
+                synchronized (connections) {
                     for (ServerThread con :
                             connections) {
-                        con.out.println(nik + " connected to Soft chat");
+                        con.out.println(nick + ": " + msg);
                     }
                 }
-
-                String msg = "";
-                while (true) {
-                    msg = in.readLine();
-                    if (msg.equals("exit")) break;
-
-                    synchronized (connections) {
-                        for (ServerThread con :
-                                connections) {
-                            con.out.println(nik + ": " + msg);
-                        }
-
-                    }
-                }
+            }
+            synchronized (connections) {
                 synchronized (connections) {
-                    synchronized (connections) {
-                        for (ServerThread con :
-                                connections) {
-                            con.out.println(nik + " has left.");
-                        }
+                    for (ServerThread con :
+                            connections) {
+                        con.out.println(nick + " has left.");
                     }
                 }
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,21 +76,55 @@ public class ServerThread extends Thread {
     }
 
     /**
-     * If We haven't player with login nickName, we create new user with password
-     * haven't pasword cheking
+     * method login user. If login isn't exist we create new user.
      */
-    private boolean checkAuthorisation(String nickName, String password) {
-        Player loginedPlayer = new Player(nickName, password);
+    private boolean authorisation() {
 
-        if (server.playersList.contains(loginedPlayer))
-        {
-            return true;
-        }
-        else {
-             server.addNewUser(nickName, password);
+        while (true) {
+            try {
+                out.println("Write a login");
+                nick = in.readLine();
+
+                out.println("Write a password");
+                String pass = in.readLine();
+                Player loginedPlayer = new Player(nick, pass);
+                ArrayList<Player> players = server.playersList;
+
+                if (isLoginExist(nick, players)) {
+                    if (isPasswordCorrect(loginedPlayer, players)) {
+                        break; // If login and password correct break from authorization
+                    } else {
+                        out.println("Wrong password, Try again.");
+                        continue;
+                    }
+                } else {
+                    server.addNewUser(nick, pass);
+                    out.println("new User added");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return false;
+    }
 
+    private boolean isPasswordCorrect(Player loginedPlayer, ArrayList<Player> players) {
+        for (Player pl :
+                players) {
+            if (pl.getNickName().equals(loginedPlayer.getNickName())) {
+                if (pl.getPasword().equals(loginedPlayer.getPasword())) return true;
+                else return false;
+            }
+        }
+        return false;
+    }
+
+    private boolean isLoginExist(String nickName, ArrayList<Player> players) {
+        for (Player pl :
+                players) {
+            if (pl.getNickName().equals(nickName)) return true;
+        }
+        return false;
     }
 
 
@@ -107,7 +139,6 @@ public class ServerThread extends Thread {
                 server.closeAll();
                 System.exit(0);
             }
-
         } catch (IOException e) {
             System.out.println("Threads weren't close");
             e.printStackTrace();

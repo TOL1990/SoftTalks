@@ -29,15 +29,15 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            System.out.println("login:");
-            String nikName = reader.readLine();
-            out.println(nikName);
-            System.out.println("Password:");
-            String password = reader.readLine();
-            out.println(password);
+
+
 
             ClientThread resender = new ClientThread(in);
             resender.start();
+            String nikName = reader.readLine();
+            out.println(nikName);
+            String password = reader.readLine();
+            out.println(password);
 
             String msgStr = "";
             while (!msgStr.equals("exit")) {
