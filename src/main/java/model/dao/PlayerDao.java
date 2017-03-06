@@ -15,24 +15,31 @@ public class PlayerDao {
     public static final String ADD_PLAYER = "INSERT INTO softchatdb.players (nick_name, password) VALUES (?,?)";
 
 
-    public static ArrayList<Player> getAllPlayers() throws SQLException {
+    private static ArrayList<Player> playersList;
+
+    public static ArrayList<Player> getAllPlayersFromDB() {
 
         Connection connection = DaoUtils.getConnection();
         ArrayList<Player> players = new ArrayList<Player>();
 
 
-        Statement statement = connection.createStatement();
-        ResultSet rs = statement.executeQuery(GET_ALL_PLAYERS);
+        Statement statement = null;
+        try {
+            statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(GET_ALL_PLAYERS);
 
-        while (rs.next()) {
-            int id = rs.getInt("id_player");
-            String nick = rs.getString("nick_name");
-            String password = rs.getString("password");
-            players.add(new Player(id, nick, password));
+            while (rs.next()) {
+                int id = rs.getInt("id_player");
+                String nick = rs.getString("nick_name");
+                String password = rs.getString("password");
+                players.add(new Player(id, nick, password));
+            }
+
+            DaoUtils.close(connection, statement, rs);
+        } catch (SQLException e) {
+            System.err.println("Can't getting players from DB");
+            e.printStackTrace();
         }
-
-        DaoUtils.close(connection, statement, rs);
-
         return players;
     }
 
@@ -46,15 +53,27 @@ public class PlayerDao {
             statement.setString(1, player.getNickName());
             statement.setString(2, player.getPasword());
             statement.executeUpdate();
+            updatePlayersCash();
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 DaoUtils.close(statement);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static ArrayList<Player> getPlayersList() {
+        if (playersList == null) {
+            playersList = getAllPlayersFromDB();
+            return playersList;
+        } else
+            return playersList;
+    }
+
+    public static void updatePlayersCash() {
+        PlayerDao.playersList = getAllPlayersFromDB();
     }
 }

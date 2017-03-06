@@ -1,6 +1,7 @@
 package server;
 
 import model.entity.Player;
+import service.DaoService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class ServerThread extends Thread {
                 out.println("Write a password");
                 String pass = in.readLine();
                 Player loginedPlayer = new Player(nick, pass);
-                ArrayList<Player> players = server.playersList;
+                ArrayList<Player> players = new DaoService().getAllPlayers();
 
                 if (isLoginExist(nick, players)) {
                     if (isPasswordCorrect(loginedPlayer, players)) {
@@ -98,7 +99,7 @@ public class ServerThread extends Thread {
                         continue;
                     }
                 } else {
-                    server.addNewUser(nick, pass);
+                    addNewUser(nick, pass);
                     out.println("new User added");
                 }
             } catch (IOException e) {
@@ -127,7 +128,6 @@ public class ServerThread extends Thread {
         return false;
     }
 
-
     public void close() {
         try {
             in.close();
@@ -143,6 +143,13 @@ public class ServerThread extends Thread {
             System.out.println("Threads weren't close");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Add new user to DB
+     */
+    public void addNewUser(String nickName, String password) {
+        new DaoService().addPlayer(nickName, password);
     }
 
 }

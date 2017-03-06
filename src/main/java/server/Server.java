@@ -17,15 +17,12 @@ public class Server {
     private List<ServerThread> serverThreads =
             Collections.synchronizedList(new ArrayList<ServerThread>());
 
-    protected static ArrayList<Player> playersList;
-
     private ServerSocket server;
 
     public Server() {
         try {
             server = new ServerSocket(PORT);
 
-            playersList = new DaoService().getAllPlayers();
             System.out.println("Server lunched");
             while (true) {
                 Socket socket = server.accept();
@@ -60,12 +57,4 @@ public class Server {
         }
     }
 
-    /**
-     * Add new user to DB and update cashed list
-     */
-    public void addNewUser(String nickName, String password) {
-        DaoService daoService = new DaoService();
-        daoService.addPlayer(nickName, password);
-        playersList = daoService.getAllPlayers();
-    }
 }

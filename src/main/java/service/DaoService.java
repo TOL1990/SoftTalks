@@ -3,7 +3,6 @@ package service;
 import model.dao.PlayerDao;
 import model.entity.Player;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -11,13 +10,7 @@ import java.util.ArrayList;
  */
 public class DaoService {
     public ArrayList<Player> getAllPlayers() {
-        ArrayList<Player> players = null;
-        try {
-            players = PlayerDao.getAllPlayers();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return players;
+        return PlayerDao.getPlayersList();
     }
 
     public void addPlayer(String nick, String password) {
